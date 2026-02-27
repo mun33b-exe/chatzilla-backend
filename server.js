@@ -37,6 +37,7 @@ async function sendOneSignalNotification({ subscriptionIds, title, body }) {
     include_subscription_ids: subscriptionIds,
     headings: { en: title },
     contents: { en: body },
+    android_channel_id: "3f48d051-1c97-4dcb-83fb-190b74c3983f" // Forces Heads-Up Dropdown
   };
 
   const response = await axios.post(
@@ -102,8 +103,9 @@ app.post("/api/notifications/group", async (req, res) => {
       return res.status(400).json({ error: "subscriptionIds array is required." });
     }
 
-    const title = `[${groupName || "Group"}] ${senderName || "Someone"}`;
-    const body = content || "New message in group.";
+    // Professional UX Formatting
+    const title = groupName || "Group";
+    const body = `${senderName || "Someone"}: ${content || "New message in group."}`;
 
     const result = await sendOneSignalNotification({
       subscriptionIds,
@@ -123,7 +125,6 @@ app.post("/api/notifications/group", async (req, res) => {
     });
   }
 });
-
 // ── Start Server ────────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`ChatZilla Notification Server running on port ${PORT}`);
